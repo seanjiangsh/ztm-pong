@@ -12,12 +12,21 @@ const corsOpt = { cors: { origin: "*", methods: ["GET", "POST"] } };
 const io = new socketIO.Server(server, corsOpt);
 io.on("connection", (sock) => {
   console.log(`client connected, ID: ${sock.id}`);
+  sock.on("disconnect", (reason) => {
+    console.log(`client disconnected, ID: ${sock.id}, reason: ${reason}`);
+    readyPlayerCount--;
+  });
+  // * self-def events
   sock.on("ready", () => {
-    console.log(`Player ready, ID:${sock.id}`);
     readyPlayerCount++;
+    console.log(`Player ready, ID:${sock.id}`);
+    console.log(`readyPlayerCount: ${readyPlayerCount}`);
     if (readyPlayerCount === 2) {
       io.emit("startGame", sock.id);
     }
+  });
+  sock.on("paddleMove", (paddleData) => {
+    sock.broadcast.emit("paddleMove", paddleData);
   });
 });
 

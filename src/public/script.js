@@ -166,7 +166,6 @@ function animate() {
 function loadGame() {
   createCanvas();
   renderIntro();
-  sock.emit("ready");
 }
 
 function startGame() {
@@ -181,6 +180,7 @@ function startGame() {
     if (paddleX[paddleIndex] > width - paddleWidth) {
       paddleX[paddleIndex] = width - paddleWidth;
     }
+    sock.emit("paddleMove", { xPosition: paddleX[paddleIndex] });
     // Hide Cursor
     canvas.style.cursor = "none";
   });
@@ -189,9 +189,17 @@ function startGame() {
 // On Load
 loadGame();
 
-sock.on("connect", () => console.log(`Connected as ${sock.id}`));
+sock.on("connect", () => {
+  console.log(`Connected as ${sock.id}`);
+  sock.emit("ready");
+});
 sock.on("startGame", (refereeId) => {
   console.log(`Referee is ${refereeId}`);
   isReferee = sock.id === refereeId;
   startGame();
+});
+sock.on("paddleMove", (paddleMove) => {
+  // * toggle 1 into 0, and 0 into 1
+  const opponentPaddleIndex = 1 - paddleIndex;
+  paddleX[opponentPaddleIndex] = paddleMove.xPosition;
 });
