@@ -28,6 +28,9 @@ io.on("connection", (sock) => {
   sock.on("paddleMove", (paddleData) => {
     sock.broadcast.emit("paddleMove", paddleData);
   });
+  sock.on("ballMove", (ballData) => {
+    sock.broadcast.emit("ballMove", ballData);
+  });
 });
 
 server.listen(PORT);
