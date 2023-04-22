@@ -1,7 +1,7 @@
 // Canvas Related
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
-const sock = io("http://localhost:5000");
+const sock = io();
 
 let isReferee = false;
 let paddleIndex = 0;
