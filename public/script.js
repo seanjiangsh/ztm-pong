@@ -1,7 +1,7 @@
 // Canvas Related
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
-const sock = io();
+const sock = io("/pong");
 
 let isReferee = false;
 let paddleIndex = 0;
@@ -198,7 +198,7 @@ sock.on("connect", () => {
   sock.emit("ready");
 });
 sock.on("startGame", (refereeId) => {
-  console.log(`Referee is ${refereeId}`);
+  console.log(`startGame, Referee is ${refereeId}`);
   isReferee = sock.id === refereeId;
   startGame();
 });

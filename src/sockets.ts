@@ -3,7 +3,8 @@ import socketIO from "socket.io";
 let readyPlayerCount = 0;
 
 export function listen(io: socketIO.Server) {
-  io.on("connection", (sock) => {
+  const pongNS = io.of("/pong");
+  pongNS.on("connection", (sock) => {
     console.log(`client connected, ID: ${sock.id}`);
 
     // * build-in events
@@ -18,7 +19,8 @@ export function listen(io: socketIO.Server) {
       console.log(`Player ready, ID:${sock.id}`);
       console.log(`readyPlayerCount: ${readyPlayerCount}`);
       if (readyPlayerCount % 2 === 0) {
-        io.emit("startGame", sock.id);
+        console.log("startGame", sock.id);
+        pongNS.emit("startGame", sock.id);
       }
     });
     sock.on("paddleMove", (paddleData) => {
