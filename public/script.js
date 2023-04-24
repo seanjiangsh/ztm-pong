@@ -67,10 +67,11 @@ function renderCanvas() {
   context.fillRect(paddleX[1], 10, paddleWidth, paddleHeight);
 
   // Dashed Center Line
+  const halfHeight = height / 2;
   context.beginPath();
   context.setLineDash([4]);
-  context.moveTo(0, 350);
-  context.lineTo(500, 350);
+  context.moveTo(0, halfHeight);
+  context.lineTo(width, halfHeight);
   context.strokeStyle = "grey";
   context.stroke();
 
@@ -172,22 +173,31 @@ function loadGame() {
   renderIntro();
 }
 
+function move(e) {
+  playerMoved = true;
+  let x;
+  if (e.type === "touchmove") {
+    x = e.touches[0].clientX;
+  } else if (e.type == "mousemove") {
+    x = e.offsetX;
+  }
+  paddleX[paddleIndex] = x;
+  if (paddleX[paddleIndex] < 0) {
+    paddleX[paddleIndex] = 0;
+  }
+  if (paddleX[paddleIndex] > width - paddleWidth) {
+    paddleX[paddleIndex] = width - paddleWidth;
+  }
+  sock.emit("paddleMove", { xPosition: paddleX[paddleIndex] });
+  // Hide Cursor
+  canvas.style.cursor = "none";
+}
+
 function startGame() {
   paddleIndex = isReferee ? 0 : 1;
   window.requestAnimationFrame(animate);
-  canvas.addEventListener("mousemove", (e) => {
-    playerMoved = true;
-    paddleX[paddleIndex] = e.offsetX;
-    if (paddleX[paddleIndex] < 0) {
-      paddleX[paddleIndex] = 0;
-    }
-    if (paddleX[paddleIndex] > width - paddleWidth) {
-      paddleX[paddleIndex] = width - paddleWidth;
-    }
-    sock.emit("paddleMove", { xPosition: paddleX[paddleIndex] });
-    // Hide Cursor
-    canvas.style.cursor = "none";
-  });
+  canvas.addEventListener("mousemove", move);
+  canvas.addEventListener("touchmove", move);
 }
 
 // On Load
